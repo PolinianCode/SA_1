@@ -15,11 +15,22 @@ class Measure:
         for i in range(0, len(self.y_signal), signal_samples//measure_samples):
             noise = ( random.random() - 0.5 ) * noise_spread 
             self.y_measure.append(self.y_signal[i] + noise) 
-        
+
+    def filter_signal(self, H = 4):
+        filtered_signal = []
+        for i in range(0, len(self.y_measure)-H):
+            counted_average = np.sum(self.y_measure[i:i+H]) / H # sum of H elements divided by H (average)
+            filtered_signal.append(counted_average) #! needed to be the same size as t_measure (+ H of nones)
+
+        return filtered_signal    
+    
+            
+
+
 pomiar = Measure(3, 250, 125)
 
+
 plt.plot(pomiar.t_signal, pomiar.y_signal)
-
-
-plt.plot(pomiar.t_measure, pomiar.y_measure, '.')
+#plt.plot(pomiar.t_measure, pomiar.y_measure, '.')
+plt.plot(pomiar.t_signal, pomiar.filter_signal())
 plt.show()
