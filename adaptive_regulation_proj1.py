@@ -19,20 +19,24 @@ class Measure:
             
 
     def filter_signal(self, H = 4):
-        filtered_signal = []
+        filtered_data = []
+
         for i in range(0, len(self.y_measure)-H):
             counted_average = np.sum(self.y_measure[i:i+H]) / H # sum of H elements divided by H (average)
-            filtered_signal.append(counted_average) #! needed to be the same size as t_measure (+ H of nones)
-
+            filtered_data.append(counted_average) #! needed to be the same size as t_measure (+ H of nones)
+        
+        indent = [None]*H
+        filtered_signal = (H%2) * [None] + filtered_data + (H%2) * [None] + [None]*(H//2)
+        print(filtered_signal)
         return filtered_signal    
     
             
 
 
-pomiar = Measure(3, 250, 125)
+pomiar = Measure(3, 1000, 250)
 
 
 plt.plot(pomiar.t_signal, pomiar.y_signal)
 #plt.plot(pomiar.t_measure, pomiar.y_measure, '.')
-plt.plot(pomiar.t_signal, pomiar.filter_signal())
+plt.plot(pomiar.t_measure, pomiar.filter_signal())
 plt.show()
