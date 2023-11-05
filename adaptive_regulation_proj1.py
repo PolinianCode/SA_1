@@ -3,6 +3,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+def MSE(original, data):
+    N = len(original)
+    sum = 0
+    for i in range(0, N):
+        sum += (original[i]-data[i])**2
+    
+    result = sum/N
+    
+    return result
+    
+
 class Measure:
     def __init__(self, cycles, signal_samples, measure_samples, noise_spread = 0.2):
         self.t_signal = np.linspace(0, cycles*2*np.pi, signal_samples) # create time axis for original signal
@@ -36,6 +47,7 @@ class Measure:
                 plt.plot(t, y, marker, label=label)
         
         plt.show()
+
         
 
 pomiar = Measure(3, 1000, 250, noise_spread=0.5)
