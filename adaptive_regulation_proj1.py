@@ -11,24 +11,35 @@ class Measure:
         self.t_measure = np.linspace(0, cycles * 2 * np.pi, measure_samples)
         self.y_measure = []
 
-        for i in range(0, len(self.y_signal), signal_samples // measure_samples):
-            noise = (random.random() - 0.5) * noise_spread
-            self.y_measure.append(self.y_signal[i] + noise)
+        #iterate over original signal and add some noise
+        for i in range(0, len(self.y_signal), signal_samples//measure_samples):
+            noise = ( random.random() - 0.5 ) * noise_spread 
+            self.y_measure.append(self.y_signal[i] + noise) 
 
-h = 7  
-pomiar = Measure(3, 1000, 250)
+    def filter_signal(self, H):
+        self.H = H
 
-def sredniaRuchoma(probki, h):
-    return np.convolve(probki, np.ones(h) / h, mode='valid')
+        self.y_filtered = np.convolve(self.y_measure, np.ones(H) / H, mode='valid')
 
-filtered_signal = sredniaRuchoma(pomiar.y_measure, h)
+        start_index = H // 2
+        end_index = start_index + len(self.y_filtered)
+        self.t_filtered = pomiar.t_measure[start_index:end_index]
+    
+    def plots(self, *args):
+        plot_options = {'signal': (self.t_signal, self.y_signal, 'b', 'Original Signal'),
+                        'measure': (self.t_measure, self.y_measure, 'r.', 'Noisy Measured Signal'),
+                        'filtered': (self.t_filtered, self.y_filtered, 'g--', 'Filtered Signal')}
+        
+        for arg in args:
+            if arg in plot_options:
+                t, y, marker, label = plot_options[arg]
+                plt.plot(t, y, marker, label=label)
+        
+        plt.show()
+        
 
+pomiar = Measure(3, 1000, 250, noise_spread=0.5)
 
-start_idx = h // 2
-end_idx = start_idx + len(filtered_signal)
+pomiar.filter_signal(7)
 
-plt.plot(pomiar.t_signal, pomiar.y_signal, label='Original Signal')
-#plt.plot(pomiar.t_measure, pomiar.y_measure, '.', label='Noisy Measured Signal')
-plt.plot(pomiar.t_measure[start_idx:end_idx], filtered_signal, 'g--', label='Filtered Signal')
-plt.legend()
-plt.show()
+pomiar.plots('signal', 'measure', 'filtered')
