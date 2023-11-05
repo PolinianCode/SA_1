@@ -16,6 +16,8 @@ class Measure:
             noise = ( random.random() - 0.5 ) * noise_spread 
             self.y_measure.append(self.y_signal[i] + noise) 
 
+            
+
     def filter_signal(self, H = 4):
         filtered_signal = []
         for i in range(0, len(self.y_measure)-H):
