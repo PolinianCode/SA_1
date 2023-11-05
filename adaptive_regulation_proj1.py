@@ -16,21 +16,31 @@ class Measure:
             noise = ( random.random() - 0.5 ) * noise_spread 
             self.y_measure.append(self.y_signal[i] + noise) 
 
-    def filter_signal(self, H = 4):
-        filtered_signal = []
-        for i in range(0, len(self.y_measure)-H):
-            counted_average = np.sum(self.y_measure[i:i+H]) / H # sum of H elements divided by H (average)
-            filtered_signal.append(counted_average) #! needed to be the same size as t_measure (+ H of nones)
+    def filter_signal(self, H):
+        self.H = H
 
-        return filtered_signal    
+        self.y_filtered = np.convolve(self.y_measure, np.ones(H) / H, mode='valid')
+
+        start_index = H // 2
+        end_index = start_index + len(self.y_filtered)
+        self.t_filtered = pomiar.t_measure[start_index:end_index]
     
-            
+    def plots(self, *args):
+        plot_options = {'signal': (self.t_signal, self.y_signal, 'b', 'Original Signal'),
+                        'measure': (self.t_measure, self.y_measure, 'r.', 'Noisy Measured Signal'),
+                        'filtered': (self.t_filtered, self.y_filtered, 'g--', 'Filtered Signal')}
+        
+        for arg in args:
+            if arg in plot_options:
+                t, y, marker, label = plot_options[arg]
+                plt.plot(t, y, marker, label=label)
+        
+        plt.show()
+        
 
+pomiar = Measure(3, 1000, 250, noise_spread=0.5)
 
-pomiar = Measure(3, 250, 125)
+pomiar.filter_signal(7)
 
+pomiar.plots('signal', 'measure', 'filtered')
 
-plt.plot(pomiar.t_signal, pomiar.y_signal)
-#plt.plot(pomiar.t_measure, pomiar.y_measure, '.')
-plt.plot(pomiar.t_signal, pomiar.filter_signal())
-plt.show()
