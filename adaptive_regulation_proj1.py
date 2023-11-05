@@ -21,12 +21,12 @@ class Measure:
         self.y_signal = signal.sawtooth(self.t_signal, 0.5) # y - triangle original function 
 
         self.t_measure = np.linspace(0, cycles*2*np.pi, measure_samples) # create time axis for measurement
-        self.y_measure = []
+        self.y_measure = signal.sawtooth(self.t_measure, 0.5)
 
         #iterate over original signal and add some noise
-        for i in range(0, len(self.y_signal), signal_samples//measure_samples):
+        for i in range(0, len(self.y_measure)):
             noise = ( random.random() - 0.5 ) * noise_spread 
-            self.y_measure.append(self.y_signal[i] + noise) 
+            self.y_measure[i] += noise 
 
     def filter_signal(self, H):
         self.H = H
