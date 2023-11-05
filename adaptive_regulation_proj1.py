@@ -61,20 +61,23 @@ signal_samples = 1000
 measure_samples = 250
 
 
-pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0)
-pomiar.filter_signal(1)
-pomiar.plots('signal', 'measure', 'filtered')
+# pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.3)
+# pomiar.filter_signal(3)
+# pomiar.plots('signal', 'measure', 'filtered')
 
 MSE_table = []
 
-# for i in range(1, 21):
-#     pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.5)
-#     pomiar.filter_signal(i)
-#     MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
+pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.5)
+h_range = 13
+for i in range(1, h_range*2, 2):
+    print(i)
+    pomiar.filter_signal(i)
+    MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
 
-#x = np.linspace(1,20,20, dtype=np.int32)
-#plt.plot(x, MSE_table)
+x = np.arange(1,h_range+1)
+plt.plot(x, MSE_table)
 plt.show()
 
+print(MSE_table)
 
 
