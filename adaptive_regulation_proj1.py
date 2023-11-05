@@ -15,7 +15,7 @@ def MSE(original, data):
     return result
 
 
-def MSE_plot(signal_samples, measure_samples):
+def MSE_H_plot(signal_samples, measure_samples):
     MSE_table = []
 
     pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.5)
@@ -24,12 +24,31 @@ def MSE_plot(signal_samples, measure_samples):
     for i in range(1, h_range*2, 2):
         print(i)
         pomiar.filter_signal(i)
-        MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
+        MSE_table.append(MSE(pomiar.y_signal[::(signal_samples//measure_samples)], pomiar.y_filtered))
 
     x = np.arange(1,h_range+1)
     plt.figure()
     plt.plot(x, MSE_table, marker='o', linestyle='--')
     plt.show()
+
+def MSE_noise_variance(signal_samples, measure_samples, H):
+    noise_spread = []
+    MSE_table = []
+    for i in range(0, 9):
+        noise_spread.append(i/10)
+        pomiar = Measure(3, signal_samples, measure_samples, i/10)
+        pomiar.filter_signal(H)
+        MSE_table.append(MSE(pomiar.y_signal[::(signal_samples//measure_samples)], pomiar.y_filtered))
+
+    x = np.arange(0, 0.9, 0.1)
+    plt.figure()
+    plt.plot(x, MSE_table, marker='o', linestyle='--')
+    plt.show()
+
+
+
+
+
 
 
 class Measure:
@@ -56,7 +75,7 @@ class Measure:
             self.filtered_data.append(step_mean)
         
         filtered_start_point = (H//2)
-        filtered_end_point = -((H//2)+(H%2))
+        filtered_end_point = -(H//2) - (H%2)
         self.y_filtered[filtered_start_point:filtered_end_point] = self.filtered_data[:]
 
         self.t_filtered = self.t_measure
@@ -78,7 +97,11 @@ class Measure:
 signal_samples = 1000
 measure_samples = 250
 
-MSE_plot(signal_samples, measure_samples)
+
+MSE_noise_variance(signal_samples, measure_samples, 5)
+
+#MSE_plot(signal_samples, measure_samples)
+
 # pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.3)
 # pomiar.filter_signal(3)
 # pomiar.plots('signal', 'measure', 'filtered')
