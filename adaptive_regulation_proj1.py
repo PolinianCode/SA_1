@@ -75,9 +75,7 @@ for i in range(1, h_range*2, 2):
     MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
 
 x = np.arange(1,h_range+1)
-plt.plot(x, MSE_table)
+plt.figure()
+plt.plot(x, MSE_table, marker='o', linestyle='--')
 plt.show()
-
 print(MSE_table)
-
-
