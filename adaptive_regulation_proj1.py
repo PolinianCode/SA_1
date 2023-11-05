@@ -13,7 +13,24 @@ def MSE(original, data):
     result = sum/N
     
     return result
-    
+
+
+def MSE_plot(signal_samples, measure_samples):
+    MSE_table = []
+
+    pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.5)
+
+    h_range = 13
+    for i in range(1, h_range*2, 2):
+        print(i)
+        pomiar.filter_signal(i)
+        MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
+
+    x = np.arange(1,h_range+1)
+    plt.figure()
+    plt.plot(x, MSE_table, marker='o', linestyle='--')
+    plt.show()
+
 
 class Measure:
     def __init__(self, cycles, signal_samples, measure_samples, noise_spread = 0.2):
@@ -42,7 +59,7 @@ class Measure:
         filtered_end_point = -((H//2)+(H%2))
         self.y_filtered[filtered_start_point:filtered_end_point] = self.filtered_data[:]
 
-        self.t_filtered = pomiar.t_measure
+        self.t_filtered = self.t_measure
     
     def plots(self, *args):
         plot_options = {'signal': (self.t_signal, self.y_signal, 'b', 'Original Signal'),
@@ -56,26 +73,16 @@ class Measure:
         
         plt.show()
 
-        
+
+            
 signal_samples = 1000
 measure_samples = 250
 
-
+MSE_plot(signal_samples, measure_samples)
 # pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.3)
 # pomiar.filter_signal(3)
 # pomiar.plots('signal', 'measure', 'filtered')
 
-MSE_table = []
 
-pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.5)
-h_range = 13
-for i in range(1, h_range*2, 2):
-    print(i)
-    pomiar.filter_signal(i)
-    MSE_table.append(MSE(pomiar.y_signal[2::(signal_samples//measure_samples)], pomiar.y_filtered))
 
-x = np.arange(1,h_range+1)
-plt.figure()
-plt.plot(x, MSE_table, marker='o', linestyle='--')
-plt.show()
-print(MSE_table)
+
