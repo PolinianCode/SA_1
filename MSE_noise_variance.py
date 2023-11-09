@@ -1,7 +1,7 @@
-from Sterowanie_adaptacyjne.SA_1.MSE import MSE
 import matplotlib.pyplot as plt
 import numpy as np
 
+import MSE
 import Measure
 
 def MSE_noise_variance(signal_samples, measure_samples, H):
