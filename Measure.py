@@ -61,4 +61,6 @@ class Measure:
                 plt.legend(args)
 
 
+        #add plot editions here
+
         plt.show()
