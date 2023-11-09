@@ -1,7 +1,10 @@
-from scipy import signal
 import matplotlib.pyplot as plt
 import numpy as np
-import random
+import Measure
+
+ORIGINAL_SAMPLES_NUM = 1000
+MEASURED_SAMPLES_NUM = 250
+
 
 def MSE(original, data):
     N = len(original)
@@ -14,7 +17,6 @@ def MSE(original, data):
     
     return result
 
-
 def MSE_H_plot(signal_samples, measure_samples):
     MSE_table = []
 
@@ -22,89 +24,52 @@ def MSE_H_plot(signal_samples, measure_samples):
 
     h_range = 13
     for i in range(1, h_range*2, 2):
-        print(i)
         pomiar.filter_signal(i)
-        MSE_table.append(MSE(pomiar.y_signal[::(signal_samples//measure_samples)], pomiar.y_filtered))
+        MSE_table.append(MSE(pomiar.original_y[::(signal_samples//measure_samples)], pomiar.filtered_y))
 
-    x = np.arange(1,h_range+1)
+    x = np.arange(1,(h_range)*2, 2)
+
+    
+    min_H = MSE_table.index(min(MSE_table)) * 2 + 1
+    print(min_H)
     plt.figure()
     plt.plot(x, MSE_table, marker='o', linestyle='--')
+    plt.xlabel("H")
+    plt.ylabel("MSE")
+    # plt.xlim(2)
+    # plt.ylim(0.002, 0.01)
     plt.show()
 
 def MSE_noise_variance(signal_samples, measure_samples, H):
-    noise_spread = []
+    noise_spread_table = []
     MSE_table = []
     for i in range(0, 9):
-        noise_spread.append(i/10)
-        pomiar = Measure(3, signal_samples, measure_samples, i/10)
+        noise_spread = i/10
+        noise_spread_table.append(noise_spread)
+        pomiar = Measure(3, signal_samples, measure_samples, noise_spread)
         pomiar.filter_signal(H)
-        MSE_table.append(MSE(pomiar.y_signal[::(signal_samples//measure_samples)], pomiar.y_filtered))
+        MSE_table.append(MSE(pomiar.original_y[::(signal_samples//measure_samples)], pomiar.filtered_y))
 
     x = np.arange(0, 0.9, 0.1)
     plt.figure()
     plt.plot(x, MSE_table, marker='o', linestyle='--')
+
+    plt.ylabel("MSE")
+    plt.xlabel("Var(Z)")
+
     plt.show()
 
 
 
+MSE_noise_variance(ORIGINAL_SAMPLES_NUM, MEASURED_SAMPLES_NUM, 9)
 
+# MSE_H_plot(signal_samples, measure_samples)
 
+pomiar = Measure(3, ORIGINAL_SAMPLES_NUM, MEASURED_SAMPLES_NUM, noise_spread=0.3)
+pomiar.filter_signal(3)
+pomiar.plots('signal', 'measured', 'filtered')
+pomiar.plots('signal', 'filtered')
 
-
-class Measure:
-    def __init__(self, cycles, signal_samples, measure_samples, noise_spread = 0.2):
-        self.t_signal = np.linspace(0, cycles*2*np.pi, signal_samples) # create time axis for original signal
-        self.y_signal = signal.sawtooth(self.t_signal, 0.5) # y - triangle original function 
-
-        self.t_measure = np.linspace(0, cycles*2*np.pi, measure_samples) # create time axis for measurement
-        self.y_measure = signal.sawtooth(self.t_measure, 0.5)
-
-        #iterate over original signal and add some noise
-        for i in range(0, len(self.y_measure)):
-            noise = ( random.random() - 0.5 ) * noise_spread 
-            self.y_measure[i] += noise 
-
-    def filter_signal(self, H):
-        self.H = H
-
-        self.y_filtered = [None] * len(self.y_measure)
-        self.filtered_data = []
-
-        for i in range(0, len(self.y_measure)-H):
-            step_mean = (np.sum(self.y_measure[i:i+H]))/H
-            self.filtered_data.append(step_mean)
-        
-        filtered_start_point = (H//2)
-        filtered_end_point = -(H//2) - (H%2)
-        self.y_filtered[filtered_start_point:filtered_end_point] = self.filtered_data[:]
-
-        self.t_filtered = self.t_measure
-    
-    def plots(self, *args):
-        plot_options = {'signal': (self.t_signal, self.y_signal, 'b', 'Original Signal'),
-                        'measure': (self.t_measure, self.y_measure, 'r.', 'Noisy Measured Signal'),
-                        'filtered': (self.t_filtered, self.y_filtered, 'g--', 'Filtered Signal')}
-        
-        for arg in args:
-            if arg in plot_options:
-                t, y, marker, label = plot_options[arg]
-                plt.plot(t, y, marker, label=label)
-        
-        plt.show()
-
-
-            
-signal_samples = 1000
-measure_samples = 250
-
-
-MSE_noise_variance(signal_samples, measure_samples, 5)
-
-#MSE_plot(signal_samples, measure_samples)
-
-# pomiar = Measure(3, signal_samples, measure_samples, noise_spread=0.3)
-# pomiar.filter_signal(3)
-# pomiar.plots('signal', 'measure', 'filtered')
 
 
 
